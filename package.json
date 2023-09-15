@@ -1,0 +1,38 @@
+{
+  "name": "mody",
+  "version": "0.0.1",
+  "description": "fast & modern http server for node",
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "dev": "tsx watch dev.ts",
+    "build": "rimraf dist && tsc"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/herudi/mody.git"
+  },
+  "bugs": {
+    "url": "https://github.com/herudi/mody/issues"
+  },
+  "author": "Herudi",
+  "license": "MIT",
+  "keywords": [
+    "node server",
+    "http server",
+    "http",
+    "https",
+    "edge server",
+    "modern http server"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.6.0",
+    "rimraf": "^5.0.1",
+    "tsx": "^3.12.8",
+    "typescript": "^5.2.2"
+  }
+}

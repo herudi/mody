@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "outDir": "dist",
+    "declaration": true,
+    "lib": ["DOM", "ESNext"]
+  },
+  "include": ["./src/**/*.ts"],
+  "exclude": ["./node_modules/**/*"]
+}
