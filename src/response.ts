@@ -4,6 +4,7 @@ import { s_body, s_def, s_headers, s_init, s_inspect } from "./symbol";
 import type { TAny } from "./types";
 
 export class NodeResponse {
+  _mody = 1;
   constructor(body?: BodyInit | null, init?: ResponseInit) {
     this[s_body] = body;
     this[s_init] = init;

@@ -9,7 +9,14 @@ import {
   ServerResponse,
 } from "node:http";
 import { createServer as createServerTls } from "node:https";
-import { C_LEN, C_TYPE, T_MULTIPART, T_TEXT } from "./constant";
+import {
+  C_LEN,
+  C_TYPE,
+  R_ENC,
+  R_NO_STREAM,
+  T_MULTIPART,
+  T_TEXT,
+} from "./constant";
 
 function mutateResponse() {
   if ((<TAny> globalThis).NativeResponse === undefined) {
@@ -19,7 +26,29 @@ function mutateResponse() {
     (<TAny> globalThis).Request = NodeRequest;
   }
 }
-async function sendStream(resWeb: TAny, res: TAny) {
+async function sendStream(resWeb: TAny, res: ServerResponse, ori = false) {
+  if (ori) {
+    resWeb = resWeb.clone();
+    const headers = {};
+    (<Headers> resWeb.headers).forEach((val, key) => {
+      // disable compression
+      if (!R_ENC.test(key)) headers[key] = val;
+    });
+    const code = resWeb.status ?? 200;
+    if (R_NO_STREAM.test(headers["content-type"] ?? headers[C_TYPE] ?? "")) {
+      const body = await resWeb.text();
+      headers[C_LEN] = Buffer.byteLength(body);
+      res.writeHead(code, headers);
+      res.end(body);
+    } else {
+      res.writeHead(code, headers);
+      if (resWeb.body != null) {
+        for await (const chunk of resWeb.body) res.write(chunk);
+      }
+      res.end();
+    }
+    return;
+  }
   if (resWeb[s_body] instanceof ReadableStream) {
     for await (const chunk of resWeb[s_body] as TAny) res.write(chunk);
     res.end();
@@ -38,6 +67,10 @@ async function sendStream(resWeb: TAny, res: TAny) {
 }
 function handleResWeb(resWeb: TAny, res: ServerResponse) {
   if (res.writableEnded) return;
+  if (resWeb._mody === void 0) {
+    sendStream(resWeb, res, true);
+    return;
+  }
   let hasHeader: undefined | number, code = 200;
   const headers = {};
   if (resWeb[s_init] !== void 0) {
@@ -45,11 +78,11 @@ function handleResWeb(resWeb: TAny, res: ServerResponse) {
     if (resWeb[s_init].headers !== void 0) {
       if (typeof resWeb[s_init].headers.get === "function") {
         (<Headers> resWeb[s_init].headers).forEach((val, key) => {
-          headers[key] = val;
+          headers[key.toLowerCase()] = val;
         });
       } else {
         for (const k in resWeb[s_init].headers) {
-          headers[k] = resWeb[s_init].headers[k];
+          headers[k.toLowerCase()] = resWeb[s_init].headers[k];
         }
       }
     }
@@ -60,11 +93,14 @@ function handleResWeb(resWeb: TAny, res: ServerResponse) {
   if (resWeb[s_headers] !== void 0) {
     hasHeader ??= 1;
     (<Headers> resWeb[s_headers]).forEach((val, key) => {
-      headers[key] = val;
+      headers[key.toLowerCase()] = val;
     });
   }
   if (typeof resWeb[s_body] === "string") {
-    if (hasHeader === void 0 || res.hasHeader(C_TYPE) === false) {
+    if (
+      hasHeader === void 0 ||
+      headers[C_TYPE] === void 0
+    ) {
       headers[C_TYPE] = T_TEXT;
     }
     headers[C_LEN] = Buffer.byteLength(resWeb[s_body]);
@@ -102,7 +138,7 @@ export const handleFetch =
     else handleResWeb(resWeb, res);
   };
 export type { FetchHandler, FetchOptions };
-
+export { NodeRequest as Request, NodeResponse as Response };
 export function serve(handler: FetchHandler, opts?: FetchOptions): Server;
 export function serve(handler: Server, opts?: FetchOptions): Server;
 export function serve(handler: TAny, opts?: FetchOptions): Server;

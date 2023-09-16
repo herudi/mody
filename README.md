@@ -84,3 +84,59 @@ router.get("/", (req) => {
 
 serve(router.handle);
 ```
+
+## Examples
+
+### Proxy
+
+```js
+import { serve } from "mody";
+
+serve((req) => fetch("https://example.com"));
+```
+
+### Send Json
+
+```js
+import { serve } from "mody";
+
+serve((req) => Response.json({ name: "john" }));
+```
+
+### Redirect
+
+```js
+import { serve } from "mody";
+
+serve((req) => {
+  const url = new URL(req.url);
+  if (url.pathname === "/") {
+    return new Response("home");
+  }
+  if (url.pathname === "/redirect") {
+    return Response.redirect(new URL("/", url.origin));
+  }
+  return new Response(null, { status: 404 });
+});
+```
+
+### Server Sent Event (SSE)
+
+```js
+import { serve } from "mody";
+
+const stream = new ReadableStream({
+  start(controller) {
+    controller.enqueue(`data: hello from sse >>\n\n`);
+    setInterval(() => {
+      controller.enqueue(`data: >>\n\n`);
+    }, 500);
+  },
+}).pipeThrough(new TextEncoderStream());
+
+serve((req) => {
+  return new Response(stream, {
+    headers: { "content-type": "text/event-stream" },
+  });
+});
+```
