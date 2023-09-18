@@ -1,6 +1,7 @@
 import { NodeHeaders } from "./headers";
 import { s_body, s_body_used, s_def, s_init, s_inspect } from "./symbol";
 import type { TAny } from "./types";
+import { Buffer } from "node:buffer";
 
 const typeError = (m: string) => Promise.reject(new TypeError(m));
 const consumed = "body already consumed";

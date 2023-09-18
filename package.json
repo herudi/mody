@@ -1,6 +1,6 @@
 {
   "name": "mody",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "fast & modern http server for node",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -27,6 +27,7 @@
     "http",
     "https",
     "edge server",
+    "fetch api server",
     "modern http server"
   ],
   "devDependencies": {

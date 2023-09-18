@@ -17,6 +17,7 @@ import {
   T_MULTIPART,
   T_TEXT,
 } from "./constant";
+import { Buffer } from "node:buffer";
 
 function mutateResponse() {
   if ((<TAny> globalThis).NativeResponse === undefined) {
@@ -51,6 +52,10 @@ async function sendStream(resWeb: TAny, res: ServerResponse, ori = false) {
   }
   if (resWeb[s_body] instanceof ReadableStream) {
     for await (const chunk of resWeb[s_body] as TAny) res.write(chunk);
+    res.end();
+    return;
+  }
+  if (resWeb.body == null) {
     res.end();
     return;
   }

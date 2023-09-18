@@ -1,6 +1,7 @@
 ## Mody
 
-Fast & Modern Http Server for Node.
+Fast and modern http server for NodeJS using
+[Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
 
 [![GitHub](https://img.shields.io/github/license/herudi/mody)](https://github.com/herudi/mody/blob/master/LICENSE)
 [![npm](https://img.shields.io/npm/v/mody)](https://www.npmjs.com/package/mody)
@@ -9,7 +10,7 @@ Fast & Modern Http Server for Node.
 ## Install
 
 ```bash
-npm i mody
+npm install mody
 ```
 
 ## Usage
@@ -84,22 +85,35 @@ serve(router.handle);
 
 ## Examples
 
-See [Examples](https://github.com/herudi/mody/blob/master/examples)
-
-### Proxy
-
-```js
-import { serve } from "mody";
-
-serve((req) => fetch("https://example.com"));
-```
-
 ### Send Json
 
 ```js
 import { serve } from "mody";
 
-serve((req) => Response.json({ name: "john" }));
+serve(() => Response.json({ name: "john" }));
+```
+
+### Upload File
+
+```ts
+import { serve } from "mody";
+import { writeFile } from "node:fs/promises";
+import { Buffer } from "node:buffer";
+
+serve(async (req) => {
+  const url = new URL(req.url);
+  if (req.method === "POST" && url.pathname === "/") {
+    const formData = await req.formData();
+    const file = formData.get("file") as File | null;
+    if (file) {
+      const ab = await file.arrayBuffer();
+      await writeFile(file.name, Buffer.from(ab));
+      return new Response("Success upload");
+    }
+    return new Response("Field file is required", { status: 422 });
+  }
+  return new Response(null, { status: 404 });
+});
 ```
 
 ### Redirect
@@ -141,6 +155,8 @@ serve((req) => {
   });
 });
 ```
+
+See More [Examples](https://github.com/herudi/mody/blob/master/examples)
 
 ## License
 
