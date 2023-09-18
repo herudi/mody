@@ -35,7 +35,7 @@ async function sendStream(resWeb: TAny, res: ServerResponse, ori = false) {
       if (!R_ENC.test(key)) headers[key] = val;
     });
     const code = resWeb.status ?? 200;
-    if (R_NO_STREAM.test(headers["content-type"] ?? headers[C_TYPE] ?? "")) {
+    if (R_NO_STREAM.test(headers[C_TYPE] ?? "")) {
       const body = await resWeb.text();
       headers[C_LEN] = Buffer.byteLength(body);
       res.writeHead(code, headers);
@@ -71,10 +71,9 @@ function handleResWeb(resWeb: TAny, res: ServerResponse) {
     sendStream(resWeb, res, true);
     return;
   }
-  let hasHeader: undefined | number, code = 200;
+  let code = 200;
   const headers = {};
   if (resWeb[s_init] !== void 0) {
-    hasHeader = 1;
     if (resWeb[s_init].headers !== void 0) {
       if (typeof resWeb[s_init].headers.get === "function") {
         (<Headers> resWeb[s_init].headers).forEach((val, key) => {
@@ -91,18 +90,12 @@ function handleResWeb(resWeb: TAny, res: ServerResponse) {
     }
   }
   if (resWeb[s_headers] !== void 0) {
-    hasHeader ??= 1;
     (<Headers> resWeb[s_headers]).forEach((val, key) => {
       headers[key.toLowerCase()] = val;
     });
   }
   if (typeof resWeb[s_body] === "string") {
-    if (
-      hasHeader === void 0 ||
-      headers[C_TYPE] === void 0
-    ) {
-      headers[C_TYPE] = T_TEXT;
-    }
+    headers[C_TYPE] ??= T_TEXT;
     headers[C_LEN] = Buffer.byteLength(resWeb[s_body]);
     res.writeHead(code, headers);
     res.end(resWeb[s_body]);
@@ -124,9 +117,8 @@ function handleResWeb(resWeb: TAny, res: ServerResponse) {
 async function asyncHandleResWeb(resWeb: Promise<TAny>, res: TAny) {
   handleResWeb(await resWeb, res);
 }
-export const handleFetch =
-  (handler: FetchHandler) =>
-  async (req: IncomingMessage, res: ServerResponse) => {
+export function handleFetch(handler: FetchHandler) {
+  return async (req: IncomingMessage, res: ServerResponse) => {
     const resWeb: TAny = handler(
       new NodeRequest(
         `http://${req.headers.host}${req.url}`,
@@ -137,6 +129,7 @@ export const handleFetch =
     if (resWeb?.then) asyncHandleResWeb(resWeb, res);
     else handleResWeb(resWeb, res);
   };
+}
 export type { FetchHandler, FetchOptions };
 export { NodeRequest as Request, NodeResponse as Response };
 export function serve(handler: FetchHandler, opts?: FetchOptions): Server;
@@ -173,4 +166,9 @@ export function serve(
   return server;
 }
 
-export default { serve, handleFetch };
+export default {
+  serve,
+  handleFetch,
+  Request: NodeRequest,
+  Response: NodeResponse,
+};

@@ -1,0 +1,16 @@
+{
+  "name": "examples",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "hono": "^3.6.3",
+    "itty-router": "^4.0.23",
+    "mody": "^0.0.3"
+  },
+  "devDependencies": {
+    "tsx": "^3.12.10"
+  }
+}

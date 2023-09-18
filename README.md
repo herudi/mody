@@ -2,6 +2,10 @@
 
 Fast & Modern Http Server for Node.
 
+[![GitHub](https://img.shields.io/github/license/herudi/mody)](https://github.com/herudi/mody/blob/master/LICENSE)
+[![npm](https://img.shields.io/npm/v/mody)](https://www.npmjs.com/package/mody)
+[![bundlejs](https://deno.bundlejs.com/badge?q=mody&config={%22esbuild%22:{%22format%22:%22cjs%22,%22platform%22:%22node%22}})](https://www.npmjs.com/package/mody)
+
 ## Install
 
 ```bash
@@ -13,40 +17,33 @@ npm i mody
 ```js
 import { serve } from "mody";
 
-// default port 3000
-serve((request) => new Response("Hello World"));
-```
-
-### With Options
-
-```js
-import { serve } from "mody";
-
 const handler = (request) => {
   return new Response("Hello World");
 };
 
-serve(handler, { port: 8000 });
+serve(handler);
+
+// serve(handler, { port: 8000 });
 ```
 
-### Request Body
+## Fetch Handler
 
-```js
-// json
-const json = await request.json();
+Mody is based on
+[Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
 
-// text
-const json = await request.text();
+### Request
 
-// formData
-const json = await request.formData();
+The [Request](https://developer.mozilla.org/en-US/docs/Web/API/Request)
+interface of the
+[Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+represents a resource request.
 
-// arrayBuffer
-const json = await request.arrayBuffer();
+### Response
 
-// blob
-const json = await request.blob();
-```
+The [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
+interface of the
+[Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+represents the response to a request.
 
 ## With Framework
 
@@ -87,6 +84,8 @@ serve(router.handle);
 
 ## Examples
 
+See [Examples](https://github.com/herudi/mody/blob/master/examples)
+
 ### Proxy
 
 ```js
@@ -125,18 +124,24 @@ serve((req) => {
 ```js
 import { serve } from "mody";
 
-const stream = new ReadableStream({
-  start(controller) {
-    controller.enqueue(`data: hello from sse >>\n\n`);
-    setInterval(() => {
-      controller.enqueue(`data: >>\n\n`);
-    }, 500);
-  },
-}).pipeThrough(new TextEncoderStream());
-
 serve((req) => {
+  let int;
+  const stream = new ReadableStream({
+    start(controller) {
+      int = setInterval(() => {
+        controller.enqueue(`data: hello, mody\n\n`);
+      }, 1000);
+    },
+    cancel() {
+      clearInterval(int);
+    },
+  });
   return new Response(stream, {
     headers: { "content-type": "text/event-stream" },
   });
 });
 ```
+
+## License
+
+[MIT](LICENSE)

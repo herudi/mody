@@ -3,4 +3,5 @@
 /example-npm
 node_modules
 /dist
-/package-lock.json
+/lib
+package-lock.json

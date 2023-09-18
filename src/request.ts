@@ -33,8 +33,6 @@ export class NodeRequest {
     return new Promise((resolve, reject) => {
       const chunks: Uint8Array[] = [];
       this.raw.req.on("data", (buf: Uint8Array) => chunks.push(buf))
-        /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
-        // @ts-ignore: Buffer for nodejs
         .on("end", () => resolve(Buffer.concat(chunks)))
         .on("error", (err: Error) => reject(err));
     });
