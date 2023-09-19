@@ -1,6 +1,6 @@
 import type { FetchHandler, FetchOptions, TAny } from "./types";
-import { NodeRequest } from "./request";
-import { NodeResponse } from "./response";
+import { ModyRequest } from "./request";
+import { ModyResponse } from "./response";
 import { s_body, s_headers, s_init } from "./symbol";
 import {
   createServer,
@@ -23,8 +23,8 @@ function mutateResponse() {
   if ((<TAny> globalThis).NativeResponse === undefined) {
     (<TAny> globalThis).NativeResponse = Response;
     (<TAny> globalThis).NativeRequest = Request;
-    (<TAny> globalThis).Response = NodeResponse;
-    (<TAny> globalThis).Request = NodeRequest;
+    (<TAny> globalThis).Response = ModyResponse;
+    (<TAny> globalThis).Request = ModyRequest;
   }
 }
 async function sendStream(resWeb: TAny, res: ServerResponse, ori = false) {
@@ -72,6 +72,7 @@ async function sendStream(resWeb: TAny, res: ServerResponse, ori = false) {
 }
 function handleResWeb(resWeb: TAny, res: ServerResponse) {
   if (res.writableEnded) return;
+  resWeb ??= new Response(null, { status: 404 });
   if (resWeb._mody === void 0) {
     sendStream(resWeb, res, true);
     return;
@@ -125,7 +126,7 @@ async function asyncHandleResWeb(resWeb: Promise<TAny>, res: TAny) {
 export function handleFetch(handler: FetchHandler) {
   return async (req: IncomingMessage, res: ServerResponse) => {
     const resWeb: TAny = handler(
-      new NodeRequest(
+      new ModyRequest(
         `http://${req.headers.host}${req.url}`,
         void 0,
         { req, res },
@@ -136,7 +137,7 @@ export function handleFetch(handler: FetchHandler) {
   };
 }
 export type { FetchHandler, FetchOptions };
-export { NodeRequest as Request, NodeResponse as Response };
+export { ModyRequest as Request, ModyResponse as Response };
 export function serve(handler: FetchHandler, opts?: FetchOptions): Server;
 export function serve(handler: Server, opts?: FetchOptions): Server;
 export function serve(handler: TAny, opts?: FetchOptions): Server;
@@ -174,6 +175,6 @@ export function serve(
 export default {
   serve,
   handleFetch,
-  Request: NodeRequest,
-  Response: NodeResponse,
+  Request: ModyRequest,
+  Response: ModyResponse,
 };

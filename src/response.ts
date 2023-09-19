@@ -1,9 +1,9 @@
 import { C_TYPE, T_JSON } from "./constant";
-import { NodeHeaders } from "./headers";
+import { ModyHeaders } from "./headers";
 import { s_body, s_def, s_headers, s_init, s_inspect } from "./symbol";
 import type { TAny } from "./types";
 
-export class NodeResponse {
+export class ModyResponse implements Response {
   _mody = 1;
   constructor(body?: BodyInit | null, init?: ResponseInit) {
     this[s_body] = body;
@@ -29,7 +29,7 @@ export class NodeResponse {
     } else {
       init.headers = { [C_TYPE]: T_JSON };
     }
-    return new NodeResponse(JSON.stringify(data), init);
+    return new ModyResponse(JSON.stringify(data), init);
   }
   private get res(): Response {
     return this[s_def] ??= new (<TAny> globalThis).NativeResponse(
@@ -65,7 +65,7 @@ export class NodeResponse {
     return this.res.bodyUsed;
   }
   clone(): Response {
-    return new NodeResponse(this[s_body], this[s_init]);
+    return new ModyResponse(this[s_body], this[s_init]);
   }
   arrayBuffer() {
     return this.res.arrayBuffer();
@@ -94,7 +94,7 @@ export class NodeResponse {
     const ret = {
       body: this.body,
       bodyUsed: this.bodyUsed,
-      headers: new NodeHeaders(this.headers),
+      headers: new ModyHeaders(this.headers),
       status: this.status,
       statusText: this.statusText,
       redirected: this.redirected,

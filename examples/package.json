@@ -8,7 +8,7 @@
   "dependencies": {
     "hono": "^3.6.3",
     "itty-router": "^4.0.23",
-    "mody": "^0.0.4"
+    "mody": "^0.0.5"
   },
   "devDependencies": {
     "tsx": "^3.12.10"

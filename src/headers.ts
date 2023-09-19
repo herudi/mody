@@ -1,7 +1,7 @@
 import { s_inspect } from "./symbol";
 import type { TAny } from "./types";
 
-export class NodeHeaders {
+export class ModyHeaders {
   constructor(public headers: Headers) {}
   [s_inspect](
     depth: number,

@@ -1,4 +1,4 @@
-import { NodeHeaders } from "./headers";
+import { ModyHeaders } from "./headers";
 import { s_body, s_body_used, s_def, s_init, s_inspect } from "./symbol";
 import type { TAny } from "./types";
 import { Buffer } from "node:buffer";
@@ -19,7 +19,7 @@ function reqBody(
     body: notBody(raw) ? void 0 : body,
   });
 }
-export class NodeRequest {
+export class ModyRequest implements Request {
   constructor(input: RequestInfo, init?: RequestInit);
   constructor(input: RequestInfo, init?: RequestInit, raw?: TAny);
   constructor(input: RequestInfo, init?: RequestInit, public raw?: TAny) {
@@ -87,7 +87,7 @@ export class NodeRequest {
     return this.req.url;
   }
   clone(): Request {
-    const req = new NodeRequest(
+    const req = new ModyRequest(
       this[s_body],
       this[s_init],
       this.raw,
@@ -180,7 +180,7 @@ export class NodeRequest {
     opts.depth = depth;
     const ret = {
       bodyUsed: this.bodyUsed,
-      headers: new NodeHeaders(this.headers),
+      headers: new ModyHeaders(this.headers),
       method: this.method,
       redirect: this.redirect,
       url: this.url,
