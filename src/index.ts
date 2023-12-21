@@ -27,6 +27,11 @@ function mutateResponse() {
     (<TAny> globalThis).Request = ModyRequest;
   }
 }
+export interface EdgeStyle extends FetchOptions {
+  fetch: (req: Request, ...args: TAny) => Response | Promise<Response>;
+  port?: number;
+  [k: string]: TAny;
+}
 async function sendStream(resWeb: TAny, res: ServerResponse, ori = false) {
   if (ori) {
     resWeb = resWeb.clone();
@@ -140,11 +145,17 @@ export type { FetchHandler, FetchOptions };
 export { ModyRequest as Request, ModyResponse as Response };
 export function serve(handler: FetchHandler, opts?: FetchOptions): Server;
 export function serve(handler: Server, opts?: FetchOptions): Server;
+export function serve(handler: EdgeStyle): Server;
 export function serve(handler: TAny, opts?: FetchOptions): Server;
 export function serve(
   handler: TAny,
   opts: FetchOptions = {},
 ): Server {
+  if (typeof handler?.fetch === "function") {
+    const fetch = handler.fetch;
+    delete handler.fetch;
+    return serve(fetch, handler);
+  }
   opts.port ??= 3000;
   opts.immediate ??= true;
   mutateResponse();
