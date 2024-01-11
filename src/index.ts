@@ -20,11 +20,11 @@ import {
 import { Buffer } from "node:buffer";
 
 function mutateResponse() {
-  if ((<TAny> globalThis).NativeResponse === undefined) {
-    (<TAny> globalThis).NativeResponse = Response;
-    (<TAny> globalThis).NativeRequest = Request;
-    (<TAny> globalThis).Response = ModyResponse;
-    (<TAny> globalThis).Request = ModyRequest;
+  if (globalThis.NativeResponse === undefined) {
+    globalThis.NativeResponse = Response;
+    globalThis.NativeRequest = Request;
+    globalThis.Response = ModyResponse;
+    globalThis.Request = ModyRequest;
   }
 }
 export interface EdgeStyle extends FetchOptions {
@@ -157,7 +157,7 @@ export function serve(
     return serve(fetch, handler);
   }
   opts.port ??= 3000;
-  opts.immediate ??= true;
+  opts.immediate ??= false;
   mutateResponse();
   const port = opts.port;
   let server: Server;

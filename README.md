@@ -1,6 +1,6 @@
 ## Mody
 
-Fast and modern http server for NodeJS using
+Edge-Style http server for NodeJS using
 [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API).
 
 [![GitHub](https://img.shields.io/github/license/herudi/mody)](https://github.com/herudi/mody/blob/master/LICENSE)
@@ -18,11 +18,7 @@ npm install mody
 ```js
 import { serve } from "mody";
 
-const handler = (request) => {
-  return new Response("Hello World");
-};
-
-serve(handler);
+serve((req) => new Response("Hello Mody"));
 
 // serve(handler, { port: 8000 });
 ```
@@ -45,43 +41,6 @@ The [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
 interface of the
 [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
 represents the response to a request.
-
-## With Framework
-
-### Hono
-
-[Hono](https://hono.dev) is a small, simple, and ultrafast web framework for the
-Edges.
-
-```js
-import { serve } from "mody";
-import { Hono } from "hono";
-
-const app = new Hono();
-
-app.get("/", (c) => c.text("hello hono"));
-
-serve(app.fetch);
-```
-
-### Itty Router
-
-[Itty](https://github.com/kwhitley/itty-router) is arguably the smallest (~450
-bytes) feature-rich JavaScript router available, while enabling dead-simple API
-code.
-
-```js
-import { serve } from "mody";
-import { Router } from "itty-router";
-
-const router = Router();
-
-router.get("/", (req) => {
-  return new Response("hello itty");
-});
-
-serve(router.handle);
-```
 
 ## Examples
 

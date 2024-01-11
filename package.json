@@ -1,8 +1,7 @@
 {
   "name": "mody",
-  "version": "0.0.6",
-  "description": "fast & modern http server for node",
-  "type": "commonjs",
+  "version": "0.0.7",
+  "description": "Edge-Style http server for node",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
